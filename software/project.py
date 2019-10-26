@@ -1,12 +1,12 @@
 from utils import *         # File with miscelaneous helper methods
-import argparse             # For getting user input
+import argparse             # For getting user input        # Installed on DAIS 1
 
 # OS performance:
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-#Keras imports:
-import keras
+#Keras imports:                                             # Installed on DAIS 1
+import keras                    
 from keras.layers import Concatenate
 from keras.layers import Conv2D, UpSampling2D, LeakyReLU, BatchNormalization, Concatenate
 from keras.models import Model
@@ -15,9 +15,9 @@ from keras.optimizers import Adam
 
 # Object created to create, save, load, and test the model
 class project:
-    def __init__(self):
+    def __init__(self, bs):
         print("\n-----> Initializing project! <-----\n")
-        self.batch = 20
+        self.batch = bs
         self.shape = (512, 512, 1)
         self.discriminator_filter_number = 64
         self.gerator_filter_number = 64
@@ -127,7 +127,8 @@ class project:
 
         for e in range(0, epoch_number) :
             counter = 0
-            avFile = open(result_file + "/report_iteration%d.txt" % (e),"a")
+            avFile = open(result_file + "/report_iteration.txt","a")
+            print('\nEpoch: %d\n' % (e))
             for (t1,t2) in zip(self.train1, self.train2):
                 
                 # Ground truth for trainning
@@ -135,6 +136,15 @@ class project:
                 #Get data from image, and generate fake
                 real_image1 = load_float(t1)
                 real_image2 = load_float(t2)
+                # real_image1 = []
+                # real_image2 = []
+
+                # for i1 in range(0,len(t1)):
+                #     real_image1.append(load_float(t1[0]))
+                #     real_image2.append(load_float(t2[0]))
+
+                #  = load_float(t1)
+                # = load_float(t2)
 
                 fake_image = self.generator.predict(real_image1)
 
@@ -149,16 +159,15 @@ class project:
                 # Train generator
                 combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])
                 
-                if e % 3 == 0:
-                    avFile.write("\n------------------ Epoch%d (Image %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
-                    avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
+                avFile.write("\n------------------ Epoch%d (Image %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
+                avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
                 
                 
                 counter +=1
             if e % 3 == 0:
                 print('Image printed at image: ',e)
                 save_image(sample_file + '/output_it%d.png' % (e), fake_image)
-            avFile.close()
+        avFile.close()
 
 
 # Saves model
@@ -175,9 +184,15 @@ if __name__ == '__main__':
     parser.add_argument('--results', dest='result_file', default='./results', help='result file directory for text related output')
     parser.add_argument('--epochs', dest='epoch_number', default=10, help='number of epochs to train the neural network')
     parser.add_argument('--save_file', dest='save_file', default='./model', help='number of epochs to train the neural network')
+    parser.add_argument('--batch_size', dest='batch_size', default=2, help='number of epochs to train the neural network')
     
+
     args = parser.parse_args()
     user_in = args.in_file
-    p = project()
+    batch = args.batch_size
+    # train1, train2 = load_names_with_batch(args.in_file, 2)
+
+
+    p = project(args.batch_size)
     p.train_model(user_in, args.sample_file, args.result_file, args.epoch_number)
-    # p.save_model(args.save_file)
+    p.save_model(args.save_file)

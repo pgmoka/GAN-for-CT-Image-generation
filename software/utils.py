@@ -1,13 +1,41 @@
 from glob import glob
-from sklearn.model_selection import train_test_split
-import numpy as np
-from PIL import Image
-from matplotlib import pyplot as plt
+from sklearn.model_selection import train_test_split    
+import numpy as np                                      # Installed on DAIS 1
+from PIL import Image                                   # Installed on DAIS 1
+from matplotlib import pyplot as plt                    # Installed on DAIS 1
 
 # Precondition: file name
 # Postcondition: array with names of images to be processed
 def load_names(filePath):
     return train_test_split(glob(filePath + '/*.flt'), test_size = 0.5)
+
+# Precondition: file name
+# Postcondition: array with names of images to be processed
+def load_names_with_batch(filePath, batch_size):
+    t1,t2 = train_test_split(glob(filePath + '/*.flt'), test_size = 0.5)
+    iterator_counter = 0
+    x1 = []
+    xt1=[]
+    x2 = []
+    xt2=[]
+    for i in range(0, len(t1)):
+        if iterator_counter == batch_size:
+            x1.append(xt1)
+            del xt1
+            xt1 = []
+
+            x2.append(xt2)
+            del xt2
+            xt2 = []
+
+            iterator_counter = 0
+        if iterator_counter < batch_size:
+            xt1.append(t1[i])
+            xt2.append(t2[i])
+            iterator_counter += 1
+
+        
+    return x1,x2
 
 # Precondition: file name to print array, and array of longs to be printed
 # Postcondition: Image save in file path
