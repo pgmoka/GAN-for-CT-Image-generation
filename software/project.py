@@ -134,7 +134,7 @@ class project:
             avFile = open(result_file + "/report_iteration.txt","a")
             print('\nEpoch: %d\n' % (e))
             for (t1,t2) in zip(self.train1, self.train2):
-                
+                print('\nBatch under %d\n' % (e))
                 # Ground truth for trainning
                 
                 # #Get data from image, and generate fake
@@ -164,13 +164,13 @@ class project:
                 # Train generator
                 combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])
                 
-                avFile.write("\n------------------ Epoch%d (Image %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
+                avFile.write("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
                 avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
-                print(("\n------------------ Epoch%d (Image %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0])))
+                print(("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0])))
                 print(("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0])))
                 counter +=1
             # if e % 3 == 0:
-            print('Image printed at image: ',e)
+            print('Image printed at batch: ',e)
             save_image(sample_file + '/output_it%d' % (e), fake_image[0])
         avFile.close()
 
@@ -189,7 +189,7 @@ if __name__ == '__main__':
     parser.add_argument('--results', dest='result_file', default='./results', help='result file directory for text related output')
     parser.add_argument('--epochs', dest='epoch_number', default=10, help='number of epochs to train the neural network')
     parser.add_argument('--save_file', dest='save_file', default='./model', help='number of epochs to train the neural network')
-    parser.add_argument('--batch_size', dest='batch_size', default=2, help='number of epochs to train the neural network')
+    parser.add_argument('--batch_size', dest='batch_size', default=3, help='number of epochs to train the neural network')
     
 
     args = parser.parse_args()
@@ -197,7 +197,8 @@ if __name__ == '__main__':
     batch = args.batch_size
 
 
-    print("\nPROGRAM OVER\n")
+    
     p = project(args.batch_size)
     p.train_model(user_in, args.sample_file, args.result_file, args.epoch_number)
     p.save_model(args.save_file)
+    print("\nPROGRAM OVER\n")

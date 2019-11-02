@@ -4,22 +4,19 @@ import numpy as np                                      # Installed on DAIS 1
 from PIL import Image                                   # Installed on DAIS 1
 from matplotlib import pyplot as plt                    # Installed on DAIS 1
 
-# Precondition: file name
-# Postcondition: array with names of images to be processed
-def create_names(filePath):
-    files1, files2 = train_test_split(glob(filePath + '/*.flt'), test_size = 0.5)
-    return files1, files2
 
-# Precondition: file name
-# Postcondition: array with names of images to be processed
+
+# Precondition: file name, size of batch to process, and path of output txt file
+# Postcondition: saves info to txt file
 def create_names_with_batch(filePath, batch_size, save_info_path):
-    t1,t2 = train_test_split(glob(filePath + '/*.flt'), test_size = 0.5)
+    test, validate = train_test_split(glob(filePath + '/*.flt'), test_size = 0.9)
+    t1,t2 = train_test_split(test, test_size = 0.5)
     # iterator_counter = 0
     # x1 = []
     # xt1=[]
     # x2 = []
     # xt2=[]
-    outFile = open(save_info_path,"a")
+    outFile = open(save_info_path + '/trainning_data_batch%d.txt'%(batch_size),"a")
     
     outFile.write((str)(batch_size) +'\n')
 
@@ -56,6 +53,9 @@ def create_names_with_batch(filePath, batch_size, save_info_path):
     outFile.close()
     # return x1,x2
 
+# Loads the names used for trainning in the batch formation specified by the txt file generated
+# from create_names_with_batch
+# Postcondition: array with names of images to be processed
 def load_text_names(file_path_in):
     outFile = open(file_path_in,"r")
     processing_batch = outFile.readline()
@@ -63,17 +63,26 @@ def load_text_names(file_path_in):
     processing_batch = int(processing_batch)
     arr1 = []
     arr2 = []
+    arr1_t = []
+    temp = outFile.readline()
+    counter = 0
+    while temp !='~\n': 
+        arr1_t.append(temp.replace('\n',''))
+        counter+=1
+        temp = outFile.readline()
+        if(counter == processing_batch):
+            counter = 0
+            arr1.append(arr1_t)
+            del arr1_t
+            arr1_t = []
 
     temp = outFile.readline()
-    while temp !='~\n':
-        arr1.append(temp)
-        temp = outFile.readline()
+
     while temp:
-        arr2.append(temp)        
+        arr2.append(temp.replace('\n',''))        
         temp = outFile.readline()
     outFile.close()
     arr1 = np.asarray(arr1)
-    arr1 = arr1.reshape((-1,processing_batch))
     arr2 = np.asarray(arr2)
     arr2 = arr2.reshape((-1,processing_batch))
     return arr1, arr2
