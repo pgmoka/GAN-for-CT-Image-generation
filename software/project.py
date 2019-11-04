@@ -12,44 +12,49 @@ from keras.layers import Conv2D, UpSampling2D, LeakyReLU, BatchNormalization, Co
 from keras.models import Model
 from keras.optimizers import Adam
 
+import tensorflow as tf
 
 # Object created to create, save, load, and test the model
 class project:
-    def __init__(self, bs):
-        print("\n-----> Initializing project! <-----\n")
-        self.batch = bs
-        self.shape = (512, 512, 1)
-        self.discriminator_filter_number = 64
-        self.gerator_filter_number = 64
-        
-        self.disc_patch = (32, 32, 1)       # Properly adjusted
-        # Load data:
-
-        # optimizer = Adam(0.0002, 0.5)
-        # Create discriminator:
-        self.discriminator = self.create_discriminator()
-        self.discriminator.compile(optimizer = 'adam',
-                    loss = 'mse',
-                    metrics = ['accuracy'])
-        # Create generator:
-        self.generator = self.create_generator()
-
-        img_A = keras.Input(shape = self.shape)
-        img_B = keras.Input(shape = self.shape)
-
-        fake = self.generator(img_B)
-        
-        # Set network for generator:
-        self.discriminator.trainable = False
-        
-        score = self.discriminator([fake, img_B])
-        self.combined = Model(inputs = [img_A, img_B], outputs = [score, fake])
-        # Change optimizer here:
-        self.combined.compile(loss = ['mse', 'mae'], loss_weights=[1,100],optimizer = 'adam')
-
-        print("-----> End of Model Creation! <-----\n")
+    def __init__(self, bs, test = 1, load_file = '.', validate_file_in = '.', validate_file_out = '.'):
+        if test == 1:
+            print("\n-----> Initializing project! <-----\n")
+            self.batch_size = bs
+            self.shape = (512, 512, 1)
+            self.discriminator_filter_number = 64
+            self.gerator_filter_number = 64
             
-# Creates a generator model, which gets an image input, and an image output
+            self.disc_patch = (32, 32, 1)       # Properly adjusted
+            # Load data:
+
+            # optimizer = Adam(0.0002, 0.5)
+            # Create discriminator:
+            self.discriminator = self.create_discriminator()
+            self.discriminator.compile(optimizer = 'adam',
+                        loss = 'mse',
+                        metrics = ['accuracy'])
+            # Create generator:
+            self.generator = self.create_generator()
+
+            img_A = keras.Input(shape = self.shape)
+            img_B = keras.Input(shape = self.shape)
+
+            fake = self.generator(img_B)
+            
+            # Set network for generator:
+            self.discriminator.trainable = False
+            
+            score = self.discriminator([fake, img_B])
+            self.combined = Model(inputs = [img_A, img_B], outputs = [score, fake])
+            # Change optimizer here:
+            self.combined.compile(loss = ['mse', 'mae'], loss_weights=[1,100],optimizer = 'adam')
+
+            print("-----> End of Model Creation! <-----\n")
+        else:
+            self.generator = keras.models.load_model(load_file)
+            self.validate_generator(validate_file_in, validate_file_out)
+
+# Postcondition: Creates a generator model, which gets an image input, and an image output
     def create_generator(self):
         print("---> Creating generator!\n")
         # Input
@@ -95,6 +100,9 @@ class project:
         img_B = keras.Input(shape = self.shape)
         combined = Concatenate(axis=-1)([img_A, img_B])
 
+        # combined = keras.backend.reshape(combined, shape = (self.batch_size,512,512,1))
+        # img_A = keras.backend.reshape(img_A, shape = (self.batch_size,512,512,1))
+        # img_B = keras.backend.reshape(img_B, shape = (self.batch_size,512,512,1))
         # Layers:
         layer1 = Conv2D(self.discriminator_filter_number, kernel_size = 4, strides = 2, padding = 'same')(combined)
         layer1 = LeakyReLU(alpha=0.2)(layer1)
@@ -118,33 +126,34 @@ class project:
     
 
 # Trains model
-    def train_model(self, data_path, sample_file, result_file, epoch_number, batch_size =1):
+# Precondition:
+    def train_model(self, data_path, validate_path, sample_file, result_file, epoch_number, info_interval):
         print("-----> Trainning model! <-----\n")
-        self.train1, self.train2 = load_names(data_path)
+        self.train1, self.train2 = load_train_text_names(data_path)
         
-        valid = np.ones((batch_size,) + self.disc_patch)
-        fake = np.zeros((batch_size,) + self.disc_patch)
+        valid = np.ones((self.batch_size,) + self.disc_patch)
+        fake = np.zeros((self.batch_size,) + self.disc_patch)
 
         for e in range(0, epoch_number) :
             counter = 0
             avFile = open(result_file + "/report_iteration.txt","a")
             print('\nEpoch: %d\n' % (e))
             for (t1,t2) in zip(self.train1, self.train2):
-                
                 # Ground truth for trainning
                 
-                #Get data from image, and generate fake
-                real_image1 = load_float(t1)
-                real_image2 = load_float(t2)
-                # real_image1 = []
-                # real_image2 = []
+                # #Get data from image, and generate fake
+                # real_image1 = load_float(t1)
+                # real_image2 = load_float(t2)
 
-                # for i1 in range(0,len(t1)):
-                #     real_image1.append(load_float(t1[0]))
-                #     real_image2.append(load_float(t2[0]))
+                real_image1 = []
+                real_image2 = []
 
-                #  = load_float(t1)
-                # = load_float(t2)
+                for i in range(0,len(t1)):
+                    real_image1.append(load_float(t1[i]))
+                    real_image2.append(load_float(t2[i]))
+
+                real_image1 = np.asarray(real_image1)
+                real_image2 = np.asarray(real_image2)
 
                 fake_image = self.generator.predict(real_image1)
 
@@ -159,18 +168,37 @@ class project:
                 # Train generator
                 combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])
                 
-                avFile.write("\n------------------ Epoch%d (Image %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
+                avFile.write("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
                 avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
-                
-                
+                print(("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0])))
+                print(("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0])))
                 counter +=1
-            if e % 3 == 0:
-                print('Image printed at image: ',e)
-                save_image(sample_file + '/output_it%d.png' % (e), fake_image)
+            if e % info_interval == 0:
+                print('Image printed at batch: ',e)
+                self.validate_generator(validate_path, sample_file,e)
+                # save_image(sample_file + '/output_it%d' % (e), fake_image[0])
         avFile.close()
 
+    def validate_generator(self, text_name_path, output_path, epoch):
+        test = load_validation_text_names(text_name_path)
+        
+        batch_counter = 0
+        # rotate through different batches
+        for v in test:
+            img = []
+            # transforms words on batch to images
+            for i in range(0,len(v)):
+                img.append(load_float(v[i]))
+            img = np.asarray(img)
+            validation_output_data = self.generator.predict(img)
+
+            #prints image
+            for j in range(0,len(validation_output_data)):
+                save_image(output_path + '/validate_e%d_b%d_img%d' % (epoch,batch_counter,j), validation_output_data[j])
+        batch_counter +=1
 
 # Saves model
+#Precondition: string destination to print model at
     def save_model(self, destination):
         print("-----> Saving model! <-----\n")
         self.generator.save(destination + "/generator.model")
@@ -179,20 +207,26 @@ class project:
 # called by the command line
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--in', dest='in_file', default='./trivial_test_data', help='input file -- directory or single file')
+    parser.add_argument('--in', dest='in_file', default='./names_log/trainning_data_batch3.txt', help='input file -- directory or single file')
+    parser.add_argument('--in_validate', dest='in_val', default='./names_log/validate_data_batch3.txt', help='input file -- directory or single file')    
     parser.add_argument('--sample', dest='sample_file', default='./sample', help='sample file directory for sample images to be saved')
     parser.add_argument('--results', dest='result_file', default='./results', help='result file directory for text related output')
     parser.add_argument('--epochs', dest='epoch_number', default=10, help='number of epochs to train the neural network')
     parser.add_argument('--save_file', dest='save_file', default='./model', help='number of epochs to train the neural network')
-    parser.add_argument('--batch_size', dest='batch_size', default=2, help='number of epochs to train the neural network')
+    parser.add_argument('--batch_size', dest='batch_size', default=3, help='number of epochs to train the neural network')
+    parser.add_argument('--info_interval', dest='intev', default=1, help='Intervals where information is saved')
     
 
     args = parser.parse_args()
     user_in = args.in_file
     batch = args.batch_size
-    # train1, train2 = load_names_with_batch(args.in_file, 2)
 
 
+    
     p = project(args.batch_size)
-    p.train_model(user_in, args.sample_file, args.result_file, args.epoch_number)
+    p.train_model(user_in, args.in_val, args.sample_file, args.result_file, args.epoch_number, args.intev)
     p.save_model(args.save_file)
+    create_names_with_batch("./trivial_test_data",3,".")
+    # test = load_validation_text_names("./validate_data_batch3.txt")
+    # p = project(args.batch_size, test=0, load_file= './model/generator.model', validate_file_in='./validate_data_batch3.txt', validate_file_out= '.')
+    print("\nPROGRAM OVER\n")
