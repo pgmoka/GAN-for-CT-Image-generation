@@ -223,10 +223,10 @@ if __name__ == '__main__':
 
 
     
-    p = project(args.batch_size)
-    p.train_model(user_in, args.in_val, args.sample_file, args.result_file, args.epoch_number, args.intev)
-    p.save_model(args.save_file)
-    create_names_with_batch("./trivial_test_data",3,".")
-    # test = load_validation_text_names("./validate_data_batch3.txt")
+    # p = project(args.batch_size)
+    # p.train_model(user_in, args.in_val, args.sample_file, args.result_file, args.epoch_number, args.intev)
+    # p.save_model(args.save_file)
+    create_names_with_batch("./trivial_test_data",3,".",15)
+    
     # p = project(args.batch_size, test=0, load_file= './model/generator.model', validate_file_in='./validate_data_batch3.txt', validate_file_out= '.')
     print("\nPROGRAM OVER\n")
