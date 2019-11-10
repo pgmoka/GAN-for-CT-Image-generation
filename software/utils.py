@@ -8,12 +8,12 @@ from matplotlib import pyplot as plt                    # Installed on DAIS 1
 
 # Precondition: file name, size of batch to process, and path of output txt file
 # Postcondition: saves info to txt file
-def create_names_with_batch(filePath, batch_size, save_info_path, quantity):
+def create_names_with_batch(filePath, batch_size, save_info_path, quantity, title = ''):
     array = glob(filePath + '/*.flt')
     validate, test = train_test_split(array[0: quantity], test_size = 0.9)
     t1,t2 = train_test_split(test, test_size = 0.5)
-    outFile = open(save_info_path + '/trainning_data_batch%d.txt'%(batch_size),"a")
-    out_validate = open(save_info_path + '/validate_data_batch%d.txt'%(batch_size),"a")
+    outFile = open(save_info_path + '/'+title+'trainning_data_b%d.txt'%(batch_size),"a")
+    out_validate = open(save_info_path + '/'+title+'validate_data_b%d.txt'%(batch_size),"a")
     
 
     outFile.write((str)(batch_size) +'\n')

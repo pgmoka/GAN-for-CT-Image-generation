@@ -2,8 +2,6 @@ from utils import *         # File with miscelaneous helper methods
 import argparse             # For getting user input        # Installed on DAIS 1
 
 # OS performance:
-import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 #Keras imports:                                             # Installed on DAIS 1
 import keras                    
@@ -170,8 +168,8 @@ class project:
                 
                 avFile.write("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
                 avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
-                print(("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0])))
-                print(("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0])))
+                # print(("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0])))
+                # print(("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0])))
                 counter +=1
             if e % info_interval == 0:
                 print('Image printed at batch: ',e)
@@ -211,10 +209,10 @@ if __name__ == '__main__':
     parser.add_argument('--in_validate', dest='in_val', default='./names_log/validate_data_batch3.txt', help='input file -- directory or single file')    
     parser.add_argument('--sample', dest='sample_file', default='./sample', help='sample file directory for sample images to be saved')
     parser.add_argument('--results', dest='result_file', default='./results', help='result file directory for text related output')
-    parser.add_argument('--epochs', dest='epoch_number', default=10, help='number of epochs to train the neural network')
+    parser.add_argument('--epochs', dest='epoch_number', default='10', help='number of epochs to train the neural network')
     parser.add_argument('--save_file', dest='save_file', default='./model', help='number of epochs to train the neural network')
-    parser.add_argument('--batch_size', dest='batch_size', default=3, help='number of epochs to train the neural network')
-    parser.add_argument('--info_interval', dest='intev', default=1, help='Intervals where information is saved')
+    parser.add_argument('--batch_size', dest='batch_size', default='3', help='number of epochs to train the neural network')
+    parser.add_argument('--info_interval', dest='intev', default='1', help='Intervals where information is saved')
     
 
     args = parser.parse_args()
@@ -223,10 +221,7 @@ if __name__ == '__main__':
 
 
     
-    # p = project(args.batch_size)
-    # p.train_model(user_in, args.in_val, args.sample_file, args.result_file, args.epoch_number, args.intev)
-    # p.save_model(args.save_file)
-    create_names_with_batch("./trivial_test_data",3,".",15)
-    
-    # p = project(args.batch_size, test=0, load_file= './model/generator.model', validate_file_in='./validate_data_batch3.txt', validate_file_out= '.')
+    p = project(int(args.batch_size))
+    p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
+    p.save_model(args.save_file)
     print("\nPROGRAM OVER\n")
