@@ -5,7 +5,6 @@ import argparse             # For getting user input        # Installed on DAIS 
 
 #Keras imports:                                             # Installed on DAIS 1
 import keras                    
-from keras.layers import Concatenate
 from keras.layers import Conv2D, UpSampling2D, LeakyReLU, BatchNormalization, Concatenate
 from keras.models import Model
 from keras.optimizers import Adam
@@ -25,11 +24,11 @@ class project:
             self.disc_patch = (32, 32, 1)       # Properly adjusted
             # Load data:
 
-            # optimizer = Adam(0.0002, 0.5)
+            # optimizer_Adam = 'adam'
             # Create discriminator:
             self.discriminator = self.create_discriminator()
-            self.discriminator.compile(optimizer = 'adam',
-                        loss = 'mse',
+            self.discriminator.compile(loss = 'mse',
+                        optimizer = Adam(0.001,0.5),
                         metrics = ['accuracy'])
             # Create generator:
             self.generator = self.create_generator()
@@ -45,12 +44,15 @@ class project:
             score = self.discriminator([fake, img_B])
             self.combined = Model(inputs = [img_A, img_B], outputs = [score, fake])
             # Change optimizer here:
-            self.combined.compile(loss = ['mse', 'mae'], loss_weights=[1,100],optimizer = 'adam')
+            self.combined.compile(loss = ['mse', 'mae'], loss_weights=[1,100],optimizer = Adam(0.001,0.5))
 
             print("-----> End of Model Creation! <-----\n")
+            print(self.generator.optimizer)
         else:
             self.generator = keras.models.load_model(load_file)
-            self.validate_generator(validate_file_in, validate_file_out)
+            self.validate_generator(validate_file_in, validate_file_out, 0)
+
+        
 
 # Postcondition: Creates a generator model, which gets an image input, and an image output
     def create_generator(self):
@@ -124,7 +126,9 @@ class project:
     
 
 # Trains model
-# Precondition:
+# Precondition: path file for testing, validation data path, file to save sample, 
+# file to save results, number of epochs for trainning, interval for saving information
+# Postcondition: trains models in the
     def train_model(self, data_path, validate_path, sample_file, result_file, epoch_number, info_interval):
         print("-----> Trainning model! <-----\n")
         self.train1, self.train2 = load_train_text_names(data_path)
@@ -164,7 +168,7 @@ class project:
                 total_loss = 0.5 * np.add(fake_image,loss_real)
 
                 # Train generator
-                combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])
+                combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])      # key point
                 
                 avFile.write("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
                 avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
@@ -193,7 +197,7 @@ class project:
             #prints image
             for j in range(0,len(validation_output_data)):
                 save_image(output_path + '/validate_e%d_b%d_img%d' % (epoch,batch_counter,j), validation_output_data[j])
-        batch_counter +=1
+            batch_counter +=1
 
 # Saves model
 #Precondition: string destination to print model at
@@ -220,8 +224,8 @@ if __name__ == '__main__':
     batch = args.batch_size
 
 
-    
-    p = project(int(args.batch_size))
-    p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
-    p.save_model(args.save_file)
+    grade = apply_brisque("./Old_logs/sample1/output_it0.png")
+    # p = project(int(args.batch_size))
+    # p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
+    # p.save_model(args.save_file)
     print("\nPROGRAM OVER\n")
