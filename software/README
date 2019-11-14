@@ -1,1 +1,26 @@
-Execution guide:
+              Execution guide
+    project.py:
+If the file is executed as main, it is possible to pass arguments related to the creation, trainning, and testing. 
+The following are the arguments that can be passed:
+--in              -> input file -- directory or single file
+--in_validate     -> input file -- directory or single file
+--sample          -> sample file directory for sample images to be saved
+--results         -> result file directory for text related output
+--epochs          -> number of epochs to train the neural network(int)
+--save_file       -> file to save/load model
+--batch_size      -> number of images per batch to train the neural network
+--info_interval   -> Intervals where information is saved
+                  
+For using the file for model creation, trainning, and saving:
+1) When initializing, pass batch size. Model will be created
+2) call .train_model with the input data file, test file, sample file, result file, number of epochs, and interval for sample
+3) Call .save_file with the file to save information
+
+For loading model, when initializing, pass batch size, test = 0, file for loading model, validation file input, validation file output
+
+During execution, it is recomended the use of the following directories:
+1) data           -> Store images in .float format.
+2) model          -> Store created models
+3) names_log      -> directory for saving text files with split data information saved in it
+4) results        -> saved text file with loss during execution
+5) sample         -> saves images of test during execution
