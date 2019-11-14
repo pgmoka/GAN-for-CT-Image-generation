@@ -1,5 +1,6 @@
-              Execution guide
-    project.py:
+Execution guide
+
+          project.py:
 If the file is executed as main, it is possible to pass arguments related to the creation, trainning, and testing. 
 The following are the arguments that can be passed:
 --in              -> input file -- directory or single file
@@ -18,6 +19,9 @@ For using the file for model creation, trainning, and saving:
 
 For loading model, when initializing, pass batch size, test = 0, file for loading model, validation file input, validation file output
 
+          utils.py
+          
+          Directories:
 During execution, it is recomended the use of the following directories:
 1) data           -> Store images in .float format.
 2) model          -> Store created models
