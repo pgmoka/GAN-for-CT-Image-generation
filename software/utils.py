@@ -1,7 +1,6 @@
 from glob import glob
 from sklearn.model_selection import train_test_split    
 import numpy as np                                      # Installed on DAIS 1
-from cv2 import cv2
 
 from PIL import Image                                   # Installed on DAIS 1
 from matplotlib import pyplot as plt                    # Installed on DAIS 1
@@ -108,7 +107,3 @@ def save_image(filePath, image):
 def load_float(fileName):
     float_arr= np.fromfile(fileName, dtype= '<f')
     return float_arr.reshape(512, 512, 1)
-
-def apply_brisque(input_path):
-    print("brique walk")
-    cv2.bris

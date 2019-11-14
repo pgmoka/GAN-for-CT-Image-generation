@@ -224,8 +224,7 @@ if __name__ == '__main__':
     batch = args.batch_size
 
 
-    grade = apply_brisque("./Old_logs/sample1/output_it0.png")
-    # p = project(int(args.batch_size))
-    # p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
-    # p.save_model(args.save_file)
+    p = project(int(args.batch_size))
+    p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
+    p.save_model(args.save_file)
     print("\nPROGRAM OVER\n")
