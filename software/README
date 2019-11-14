@@ -20,7 +20,11 @@ For using the file for model creation, trainning, and saving:
 For loading model, when initializing, pass batch size, test = 0, file for loading model, validation file input, validation file output
 
           utils.py
-          
+File contains helper methods used by all other present files. More instructions for each method in file
+
+          create_datases.py
+File contains methods used for creating the text files used for the testing of the project.
+
           Directories:
 During execution, it is recomended the use of the following directories:
 1) data           -> Store images in .float format.
