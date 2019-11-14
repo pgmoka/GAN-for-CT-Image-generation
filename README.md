@@ -5,7 +5,7 @@ CURRENT DEVELOPMENT PHASE
 Model is able to be 
 
 INFORMATION
-This project has been based in the research work for the paper in this repository("Pix2Pix"), and the Git repository of Keras implementations of Generative Adversarial Networks(https://github.com/eriklindernoren/Keras-GAN)
+This project has been based in the research work for the paper in this repository("Image-to-ImageTranslationwithConditionalAdversarialNetworks.pdf"), and the Git repository of Keras implementations of Generative Adversarial Networks(https://github.com/eriklindernoren/Keras-GAN)
 
 ACHIEVED GOALS (in time implementation)
 - Research GAN phase
