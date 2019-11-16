@@ -22,12 +22,12 @@ ACHIEVED GOALS (in time implementation)
     - Create a guide for image creation
 - Create a success standard for image creation
     - Create software to test this easily
+- Make test output to be easier to check with original image
+- Create github instructions
 
 FUTURE GOALS (in implementation priority)
-- Make test output to be easier to check with original image
 - Automated BRISQUE test of images
 - PSNR comparison for close looking images
-- Create github instructions
 - Better in code documentation
 
 CITATIONS:
