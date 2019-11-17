@@ -170,10 +170,10 @@ class project:
                 # Train generator
                 combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])      # key point
                 
-                avFile.write("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0]))
-                avFile.write("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0]))
-                # print(("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %d" % (e, counter, loss_real[0])))
-                # print(("\n- Loss for fake images %d\n---Generator:\n- Loss: %d" % (loss_fake[0], combined_loss[0])))
+                avFile.write("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %.4f" % (e, counter, loss_real[0]))
+                avFile.write("\n- Loss for fake images %.4f\n---Generator:\n- Loss: %.4f" % (loss_fake[0], combined_loss[0]))
+                # print("\n------------------ Epoch%d (Batch %d)\n---Discriminator:\n- Loss for real images: %.4f" % (e, counter, loss_real[0]))
+                # print("\n- Loss for fake images %.4f\n---Generator:\n- Loss: %.4f" % (loss_fake[0], combined_loss[0]))
                 counter +=1
             if e % info_interval == 0:
                 print('Image printed at batch: ',e)
@@ -181,6 +181,8 @@ class project:
                 # save_image(sample_file + '/output_it%d' % (e), fake_image[0])
         avFile.close()
 
+# Precondition: path where location of the path is, location path to output sample, epoch at location
+# Postcondition: Images saved
     def validate_generator(self, text_name_path, output_path, epoch):
         test = load_validation_text_names(text_name_path)
         
@@ -196,7 +198,8 @@ class project:
 
             #prints image
             for j in range(0,len(validation_output_data)):
-                save_image(output_path + '/validate_e%d_b%d_img%d' % (epoch,batch_counter,j), validation_output_data[j])
+                isolate = v[j].split('/')[-1].split('\\')[-1].split('.')[0]
+                save_image(output_path + '/' + isolate+ '_validate_e%d_b%d_img%d' % (epoch,batch_counter,j), validation_output_data[j])
             batch_counter +=1
 
 # Saves model
@@ -213,9 +216,9 @@ if __name__ == '__main__':
     parser.add_argument('--in_validate', dest='in_val', default='./names_log/validate_data_batch3.txt', help='input file -- directory or single file')    
     parser.add_argument('--sample', dest='sample_file', default='./sample', help='sample file directory for sample images to be saved')
     parser.add_argument('--results', dest='result_file', default='./results', help='result file directory for text related output')
-    parser.add_argument('--epochs', dest='epoch_number', default='10', help='number of epochs to train the neural network')
-    parser.add_argument('--save_file', dest='save_file', default='./model', help='number of epochs to train the neural network')
-    parser.add_argument('--batch_size', dest='batch_size', default='3', help='number of epochs to train the neural network')
+    parser.add_argument('--epochs', dest='epoch_number', default='10', help='number of epochs to train the neural network(int)')
+    parser.add_argument('--save_file', dest='save_file', default='./model', help='file to save/load model')
+    parser.add_argument('--batch_size', dest='batch_size', default='3', help='number of images per batch to train the neural network')
     parser.add_argument('--info_interval', dest='intev', default='1', help='Intervals where information is saved')
     
 
@@ -227,4 +230,5 @@ if __name__ == '__main__':
     p = project(int(args.batch_size))
     p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
     p.save_model(args.save_file)
+    # test = './names_log/trainning_data_batch3.txt'.split('/')[-1].split('.')[0]
     print("\nPROGRAM OVER\n")
