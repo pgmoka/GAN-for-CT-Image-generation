@@ -165,7 +165,7 @@ class project:
                 # Trains on fake images
                 loss_fake = self.discriminator.train_on_batch([real_image1, fake_image], fake)
                 
-                total_loss = 0.5 * np.add(fake_image,loss_real)
+                # total_loss = 0.5 * np.add(fake_image,loss_real)
 
                 # Train generator
                 combined_loss = self.combined.train_on_batch([real_image1, real_image2], [valid, real_image1])      # key point
@@ -199,7 +199,7 @@ class project:
             #prints image
             for j in range(0,len(validation_output_data)):
                 isolate = v[j].split('/')[-1].split('\\')[-1].split('.')[0]
-                save_image(output_path + '/' + isolate+ '_validate_e%d_b%d_img%d' % (epoch,batch_counter,j), validation_output_data[j])
+                save_image(output_path + '/' + isolate+ '_validate_e%d_b%d_img%d_psnr%d' % (epoch,batch_counter,j,psnr[j]), validation_output_data[j])
             batch_counter +=1
 
 # Saves model
@@ -230,5 +230,7 @@ if __name__ == '__main__':
     p = project(int(args.batch_size))
     p.train_model(user_in, args.in_val, args.sample_file, args.result_file, int(args.epoch_number), int(args.intev))
     p.save_model(args.save_file)
-    # test = './names_log/trainning_data_batch3.txt'.split('/')[-1].split('.')[0]
+    
+    # psnr_test = check_psnr('./data/00000005_img.flt', 
+    # './data/00000024_img.flt')
     print("\nPROGRAM OVER\n")

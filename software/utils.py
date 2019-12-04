@@ -42,6 +42,7 @@ def create_names_with_batch(filePath, batch_size, save_info_path, quantity, titl
 
 # Loads the names used for trainning in the batch formation specified by the txt file generated
 # from create_names_with_batch
+# Precondition: file for input
 # Postcondition: array with names of images to be processed
 def load_train_text_names(file_path_in):
     outFile = open(file_path_in,"r")
@@ -75,6 +76,8 @@ def load_train_text_names(file_path_in):
     arr2 = arr2.reshape((-1,processing_batch))
     return arr1, arr2
 
+# Precondition: file of input to load variables from
+# Postcondition: array with variable giiven names to read
 def load_validation_text_names(file_path_in):
     outFile = open(file_path_in,"r")
     processing_batch = outFile.readline()
@@ -93,6 +96,9 @@ def load_validation_text_names(file_path_in):
 
 # Precondition: file name to print array, and array of longs to be printed
 # Postcondition: Image save in file path
+# Based on 
+# https://github.com/DrDongSi/CT_Image_Reconstruction/blob/master/SART_and_LEARN/phase_2/utils.py
+# save_image method
 def save_image(filePath, image):
     image.tofile(filePath + '.flt')
 
@@ -104,6 +110,26 @@ def save_image(filePath, image):
 
 # Precondition: name of file of image
 # Postcondition: array based on image
+# Based on 
+# https://github.com/DrDongSi/CT_Image_Reconstruction/blob/master/SART_and_LEARN/phase_2/utils.py
+# load_float method
 def load_float(fileName):
     float_arr= np.fromfile(fileName, dtype= '<f')
     return float_arr.reshape(512, 512, 1)
+
+# Precondtion: Given 2 arrays, calculate the proper PSNR
+# Postcondition: int with PSNR grade
+# Based on 
+# https://github.com/DrDongSi/CT_Image_Reconstruction/blob/master/SART_and_LEARN/phase_2/utils.py
+# cal_psnr method
+def cal_PSNR(img1, img2):
+    mse = ((img1.astype(np.float) - img2.astype(np.float)) ** 2).mean()
+    psnr = 10 * np.log10(255 ** 2 / mse)
+    return psnr
+
+# Precondition: 
+# Postcondition: 
+def check_psnr(path_1, path_2):
+    img1 = load_float(path_1)
+    img2 = load_float(path_2)
+    return cal_PSNR(img1, img2)
