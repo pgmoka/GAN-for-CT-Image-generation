@@ -1,0 +1,10 @@
+python project.py --in ./names_log/30_trainning_data_b3.txt --in_validate ./names_log/30_validate_data_b3.txt --info_interval 1
+
+python project.py --in ./names_log/30_trainning_data_b3.txt --in_validate ./names_log/300_validate_data_b3.txt --info_interval 10 --epochs 200
+
+python project.py --in ./names_log/300_trainning_data_b3.txt --in_validate ./names_log/300_validate_data_b3.txt --info_interval 10 --epochs 50
+
+python project.py --in ./names_log/300_trainning_data_b3.txt --in_validate ./names_log/300_validate_data_b3.txt --info_interval 10 --epochs 200
+
+python project.py --in ./names_log/3000_trainning_data_b3.txt --in_validate ./names_log/3000_validate_data_b3.txt --info_interval 30 --epochs 200
+

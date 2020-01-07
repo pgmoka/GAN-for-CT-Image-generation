@@ -1,0 +1,4 @@
+3
+./data/train/00002059_img.flt
+./data/train/00000611_img.flt
+./data/train/00002246_img.flt
